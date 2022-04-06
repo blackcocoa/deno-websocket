@@ -1,5 +1,5 @@
 import { EventEmitter } from "./../deps.ts";
-import { serveTLS, Server } from "./../deps.ts";
+import { serve, serveTLS, Server } from "./../deps.ts";
 import {
   acceptWebSocket,
   isWebSocketCloseEvent,
@@ -20,17 +20,23 @@ export enum WebSocketState {
 export class WebSocketServer extends EventEmitter {
   clients: Set<WebSocketAcceptedClient> = new Set<WebSocketAcceptedClient>();
   server?: Server = undefined;
+
   constructor(
     private port: number = 8080,
     private realIpHeader: string | null = null,
-    private certFile: string,
-    private keyFile: string
+    private certFile: string | null = null,
+    private keyFile: string | null = null
   ) {
     super();
     this.connect(certFile, keyFile);
   }
-  async connect(certFile: string, keyFile: string) {
-    this.server = serveTLS({ hostname: "", port: this.port, certFile, keyFile });
+
+  async connect(certFile: string | null = null, keyFile: string | null = null) {
+    if (certFile && keyFile) {
+      this.server = serveTLS({ hostname: "", port: this.port, certFile, keyFile });
+    } else {
+      this.server = serve(`:${this.port}`);
+    }
     for await (const req of this.server) {
       const { conn, r: bufReader, w: bufWriter, headers } = req;
       try {

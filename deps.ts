@@ -1,5 +1,5 @@
 export { EventEmitter, on } from "https://deno.land/std@0.92.0/node/events.ts";
-export { serveTLS, Server } from "https://deno.land/std@0.92.0/http/server.ts";
+export { serve, serveTLS, Server } from "https://deno.land/std@0.92.0/http/server.ts";
 export {
   acceptWebSocket,
   isWebSocketCloseEvent,
